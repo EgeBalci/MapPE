@@ -1,12 +1,14 @@
 package mape
 
-import "path/filepath"
+import (
+	"path/filepath"
 
-import "io/ioutil"
-import "debug/pe"
+	"debug/pe"
+	"io/ioutil"
 
-import "errors"
-import "bytes"
+	"bytes"
+	"errors"
+)
 
 // CreateFileMapping constructs the memory mapped image of given PE file.
 func CreateFileMapping(fileName string) ([]byte, error) {
@@ -32,23 +34,24 @@ func CreateFileMapping(fileName string) ([]byte, error) {
 	offset := opt.ImageBase
 	Map.Write(rawFile[0:int(opt.SizeOfHeaders)])
 	offset += uint64(opt.SizeOfHeaders)
-
-	for i := 0; i < len(file.Sections); i++ {
+	for _, sec := range file.Sections {
 		// Append null bytes if there is a gap between sections or PE header
-		for offset < (uint64(file.Sections[i].VirtualAddress) + opt.ImageBase) {
+		for offset < (uint64(sec.VirtualAddress) + opt.ImageBase) {
 			Map.WriteString(string(0x00))
 			offset++
 		}
 		// Map the section
-		section, err := file.Sections[i].Data()
-		return nil, err
+		section, err := sec.Data()
+		if err != nil {
+			return nil, err
+		}
 		_, err = Map.Write(section)
 		if err != nil {
 			return nil, err
 		}
-		offset += uint64(file.Sections[i].Size)
+		offset += uint64(sec.Size)
 		// Append null bytes until reaching the end of the virtual address of the section
-		for offset < (uint64(file.Sections[i].VirtualAddress) + uint64(file.Sections[i].VirtualSize) + opt.ImageBase) {
+		for offset < (uint64(sec.VirtualAddress) + uint64(sec.VirtualSize) + opt.ImageBase) {
 			Map.WriteString(string(0x00))
 			offset++
 		}
@@ -65,8 +68,10 @@ func CreateFileMapping(fileName string) ([]byte, error) {
 func PerformIntegrityChecks(fileName string, memMap []byte) error {
 
 	Map := bytes.Buffer{}
-	Map.Write(memMap)
-
+	_, err := Map.Write(memMap)
+	if err != nil {
+		return err
+	}
 	abs, err := filepath.Abs(fileName)
 	if err != nil {
 		return err
@@ -90,9 +95,9 @@ func PerformIntegrityChecks(fileName string, memMap []byte) error {
 	}
 
 	for _, j := range file.Sections {
-		for k := 0; k < int(j.Size/10); k++ {
+		for k := 0; k < int(j.Size); k++ {
 			Buffer := Map.Bytes()
-			if rawFile[int(int(j.Offset)+k)] != Buffer[int(int(j.VirtualAddress)+k)] {
+			if rawFile[int(j.Offset)+k] != Buffer[int(j.VirtualAddress)+k] {
 				report += "\n[-] Broken section alignment at" + j.Name
 			}
 		}
