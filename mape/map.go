@@ -83,7 +83,7 @@ func PerformIntegrityChecks(fileName string, memMap []byte) error {
 		return err
 	}
 
-	opt := file.OptionalHeader.(*pe.OptionalHeader64) // Will use OptionalHeader64 for all
+	opt := ConvertOptionalHeader(file)
 	report := "\n[INTEGRITY CHECK FAILED]"
 	if int(opt.SizeOfImage) != Map.Len() {
 		report += "\n[-] Mapping size does not match the size of image header"
