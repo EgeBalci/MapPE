@@ -10,8 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"./mape"
-	//"github.com/egebalci/mappe/mape"
+	"github.com/egebalci/mappe/mape"
 )
 
 // ARGS tool arguments
