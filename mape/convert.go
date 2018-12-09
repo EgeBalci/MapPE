@@ -41,7 +41,7 @@ func ConvertOptionalHeader(file *pe.File) OptionalHeader {
 		opt.LoaderFlags = file.OptionalHeader.(*pe.OptionalHeader64).LoaderFlags
 		opt.NumberOfRvaAndSizes = file.OptionalHeader.(*pe.OptionalHeader64).NumberOfRvaAndSizes
 
-		for i, j := range file.OptionalHeader.(*pe.OptionalHeader32).DataDirectory {
+		for i, j := range file.OptionalHeader.(*pe.OptionalHeader64).DataDirectory {
 			opt.DataDirectory[i].VirtualAddress = j.VirtualAddress
 			opt.DataDirectory[i].Size = j.Size
 		}
@@ -77,7 +77,7 @@ func ConvertOptionalHeader(file *pe.File) OptionalHeader {
 		opt.LoaderFlags = file.OptionalHeader.(*pe.OptionalHeader32).LoaderFlags
 		opt.NumberOfRvaAndSizes = file.OptionalHeader.(*pe.OptionalHeader32).NumberOfRvaAndSizes
 
-		for i, j := range file.OptionalHeader.(*pe.OptionalHeader64).DataDirectory {
+		for i, j := range file.OptionalHeader.(*pe.OptionalHeader32).DataDirectory {
 			opt.DataDirectory[i].VirtualAddress = j.VirtualAddress
 			opt.DataDirectory[i].Size = j.Size
 		}
