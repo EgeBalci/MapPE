@@ -23,6 +23,7 @@ func CreateFileMapping(fileName string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
 	rawFile, err := ioutil.ReadFile(abs)
 	if err != nil {
