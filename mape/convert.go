@@ -41,6 +41,11 @@ func ConvertOptionalHeader(file *pe.File) OptionalHeader {
 		opt.LoaderFlags = file.OptionalHeader.(*pe.OptionalHeader64).LoaderFlags
 		opt.NumberOfRvaAndSizes = file.OptionalHeader.(*pe.OptionalHeader64).NumberOfRvaAndSizes
 
+		for i, j := range file.OptionalHeader.(*pe.OptionalHeader32).DataDirectory {
+			opt.DataDirectory[i].VirtualAddress = j.VirtualAddress
+			opt.DataDirectory[i].Size = j.Size
+		}
+
 	} else if file.Machine == 0x14C {
 		opt.Magic = file.OptionalHeader.(*pe.OptionalHeader32).Magic
 		opt.MajorLinkerVersion = file.OptionalHeader.(*pe.OptionalHeader32).MajorLinkerVersion
@@ -71,11 +76,11 @@ func ConvertOptionalHeader(file *pe.File) OptionalHeader {
 		opt.SizeOfHeapCommit = uint64(file.OptionalHeader.(*pe.OptionalHeader32).SizeOfHeapCommit)
 		opt.LoaderFlags = file.OptionalHeader.(*pe.OptionalHeader32).LoaderFlags
 		opt.NumberOfRvaAndSizes = file.OptionalHeader.(*pe.OptionalHeader32).NumberOfRvaAndSizes
-	}
 
-	for i, j := range file.OptionalHeader.(*pe.OptionalHeader32).DataDirectory {
-		opt.DataDirectory[i].VirtualAddress = j.VirtualAddress
-		opt.DataDirectory[i].Size = j.Size
+		for i, j := range file.OptionalHeader.(*pe.OptionalHeader64).DataDirectory {
+			opt.DataDirectory[i].VirtualAddress = j.VirtualAddress
+			opt.DataDirectory[i].Size = j.Size
+		}
 	}
 
 	return opt
