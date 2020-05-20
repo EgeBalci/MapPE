@@ -77,8 +77,8 @@ func main() {
 	mapFile, err := os.Create(abs + ".map")
 	pError(err)
 	defer mapFile.Close()
-	verbose("Scraping file headers...", "*")
 	if args.scrape {
+		verbose("Scraping file headers...", "*")
 		mapFile.Write(mape.Scrape(Map))
 	} else {
 		mapFile.Write(Map)
