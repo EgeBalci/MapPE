@@ -38,7 +38,7 @@ func main() {
 	rawFile, err2 := ioutil.ReadFile(abs)
 	pError(err2)
 
-	opt := mappe.ConvertOptionalHeader(file)
+	opt := mappe.UnifyOptionalHeader(file)
 
 	printVerbose("File Size: "+strconv.Itoa(len(rawFile))+" byte", "*")
 	printVerbose("Machine:"+fmt.Sprintf(" 0x%X", uint64(file.FileHeader.Machine)), "*")
