@@ -1,4 +1,4 @@
-package mape
+package mappe
 
 // OptionalHeader = pe.OptionalHeader64
 type OptionalHeader struct {

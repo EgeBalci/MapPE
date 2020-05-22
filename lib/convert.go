@@ -1,12 +1,12 @@
-package mape
+package mappe
 
 import (
 	"debug/pe"
 )
 
-// ConvertOptionalHeader stores a given
+// UnifyOptionalHeader stores a given
 // 32 bit OptionalHeader struct inside a 64 bit OptionalHeader
-func ConvertOptionalHeader(file *pe.File) OptionalHeader {
+func UnifyOptionalHeader(file *pe.File) OptionalHeader {
 
 	var opt OptionalHeader
 

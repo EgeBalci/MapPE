@@ -1,4 +1,4 @@
-package mape
+package mappe
 
 import (
 	"path/filepath"
@@ -30,7 +30,7 @@ func CreateFileMapping(fileName string) ([]byte, error) {
 		return nil, err
 	}
 
-	opt := ConvertOptionalHeader(file)
+	opt := UnifyOptionalHeader(file)
 	Map := bytes.Buffer{}
 	offset := opt.ImageBase
 	Map.Write(rawFile[0:int(opt.SizeOfHeaders)])
@@ -89,24 +89,24 @@ func PerformIntegrityChecks(fileName string, memMap []byte) error {
 		return err
 	}
 
-	opt := ConvertOptionalHeader(file)
-	report := "\n[INTEGRITY CHECK FAILED]"
+	opt := UnifyOptionalHeader(file)
+	report := ""
 	if int(opt.SizeOfImage) != Map.Len() {
-		report += "\n[-] Mapping size does not match the size of image header"
+		report += "\t- Mapping size does not match the size of image header"
 	}
 
 	for _, j := range file.Sections {
 		for k := 0; k < int(j.Size); k++ {
 			Buffer := Map.Bytes()
 			if rawFile[int(j.Offset)+k] != Buffer[int(j.VirtualAddress)+k] {
-				report += "\n[-] Broken section alignment at" + j.Name
+				report += "\t- Broken section alignment at" + j.Name
 			}
 		}
 
 	}
 
-	if report == "\n[INTEGRITY CHECK FAILED] " {
-		return errors.New(report)
+	if report != "" {
+		return errors.New("integrity checks failed: \n" + report)
 	}
 	return nil
 }
