@@ -4,7 +4,6 @@ MapPE constructs the memory mapped image of given PE files.
 ```
 go get github.com/egebalci/mappe
 ```
-For using as a library import with `github.com/egebalci/mappe/mape`
 
 ```
                       _____________________
