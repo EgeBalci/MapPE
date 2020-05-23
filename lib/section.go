@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"debug/pe"
 	"encoding/gob"
+	"errors"
 	"io/ioutil"
 	"strings"
 )
@@ -60,6 +61,11 @@ func SetSection(fileName string, sectionName string, newSectionData []byte) erro
 	if err != nil {
 		return err
 	}
+
+	if oldSectionHeaderData.Len() != newSectionHeaderData.Len() {
+		return errors.New("section headers size increased")
+	}
+
 	// Replace section header data
 	rawFile = []byte(strings.ReplaceAll(string(rawFile), string(oldSectionHeaderData.Bytes()), string(newSectionHeaderData.Bytes())))
 
