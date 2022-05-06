@@ -2,7 +2,7 @@
 MapPE constructs the memory mapped image of given PE files.
 
 ```
-go get github.com/egebalci/mappe
+go install github.com/egebalci/mappe@latest
 ```
 
 ```
