@@ -1,7 +1,13 @@
 package mappe
 
-// OptionalHeader = pe.OptionalHeader64
-type OptionalHeader struct {
+import (
+	"debug/pe"
+	"io/ioutil"
+	"path/filepath"
+)
+
+// UnifiedOptionalHeader = pe.OptionalHeader64
+type UnifiedOptionalHeader struct {
 	Magic                       uint16
 	MajorLinkerVersion          uint8
 	MinorLinkerVersion          uint8
@@ -38,4 +44,35 @@ type OptionalHeader struct {
 type DataDirectory struct {
 	VirtualAddress uint32
 	Size           uint32
+}
+
+// PEMap holds the PE file for processing
+type PEMap struct {
+	Name string
+	PE   *pe.File
+	Raw  []byte
+}
+
+// Open a new PEMap
+func Open(fileName string) (*PEMap, error) {
+
+	abs, err := filepath.Abs(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	new := PEMap{Name: abs}
+	peFile, err := pe.Open(fileName)
+	defer peFile.Close()
+	if err != nil {
+		return nil, err
+	}
+	new.PE = peFile
+
+	rawFile, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+	new.Raw = rawFile
+	return &new, nil
 }

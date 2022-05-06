@@ -1,41 +1,19 @@
 package mappe
 
 import (
-	"path/filepath"
-
-	"debug/pe"
-	"io/ioutil"
-
 	"bytes"
 	"errors"
 )
 
 // CreateFileMapping constructs the memory mapped image of given PE file.
-func CreateFileMapping(fileName string) ([]byte, error) {
+func (file PEMap) CreateFileMapping() ([]byte, error) {
 
-	abs, err := filepath.Abs(fileName)
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := pe.Open(abs)
-	defer file.Close()
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	rawFile, err := ioutil.ReadFile(abs)
-	if err != nil {
-		return nil, err
-	}
-
-	opt := UnifyOptionalHeader(file)
+	opt := file.UnifyOptionalHeader()
 	Map := bytes.Buffer{}
 	offset := opt.ImageBase
-	Map.Write(rawFile[0:int(opt.SizeOfHeaders)])
+	Map.Write(file.Raw[0:int(opt.SizeOfHeaders)])
 	offset += uint64(opt.SizeOfHeaders)
-	for _, sec := range file.Sections {
+	for _, sec := range file.PE.Sections {
 		// Append null bytes if there is a gap between sections or PE header
 		for offset < (uint64(sec.VirtualAddress) + opt.ImageBase) {
 			Map.WriteString(string(0x00))
@@ -66,39 +44,24 @@ func CreateFileMapping(fileName string) ([]byte, error) {
 }
 
 // PerformIntegrityChecks validates the integrity of the mapped PE file
-func PerformIntegrityChecks(fileName string, memMap []byte) error {
+func (file PEMap) PerformIntegrityChecks(memMap []byte) error {
 
 	Map := bytes.Buffer{}
 	_, err := Map.Write(memMap)
 	if err != nil {
 		return err
 	}
-	abs, err := filepath.Abs(fileName)
-	if err != nil {
-		return err
-	}
 
-	file, err := pe.Open(abs)
-	defer file.Close()
-	if err != nil {
-		return err
-	}
-
-	rawFile, err := ioutil.ReadFile(abs)
-	if err != nil {
-		return err
-	}
-
-	opt := UnifyOptionalHeader(file)
+	opt := file.UnifyOptionalHeader()
 	report := ""
 	if int(opt.SizeOfImage) != Map.Len() {
 		report += "\t- Mapping size does not match the size of image header"
 	}
 
-	for _, j := range file.Sections {
+	for _, j := range file.PE.Sections {
 		for k := 0; k < int(j.Size); k++ {
 			Buffer := Map.Bytes()
-			if rawFile[int(j.Offset)+k] != Buffer[int(j.VirtualAddress)+k] {
+			if file.Raw[int(j.Offset)+k] != Buffer[int(j.VirtualAddress)+k] {
 				report += "\t- Broken section alignment at" + j.Name
 			}
 		}
