@@ -1,3 +1,3 @@
-module github.com/egebalci/mappe
+module github.com/EgeBalci/MapPE
 
 go 1.18

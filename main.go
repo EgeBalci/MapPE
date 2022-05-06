@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	mappe "github.com/egebalci/mappe/pkg"
+	mappe "github.com/EgeBalci/MapPE/pkg"
 )
 
 var verbose *bool
